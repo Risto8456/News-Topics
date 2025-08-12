@@ -3,6 +3,7 @@
 + 執行 main 就好，其它是子工作流
 + n8n 須設定讀取/寫入磁碟功能
 + "Get 3 Divide Keywords" 最多需要 3 個 OpenAI Key
++ 有一些 HTTP 我是用 Gemini 一些是 OpenAI
 
 ## Local API 本地 API
 + 只要執行 localAPI.py 就行
