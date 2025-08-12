@@ -1,0 +1,241 @@
+{
+  "name": "completion",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"temperature\": 0.2,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"你是〈內容事實檢驗與因果分析專家〉。\\n\\n請根據使用者提供的「判斷依據」全文，判斷指定「文章」的真實與合理性，並輸出因果關係與判斷理由。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"文章：{{ JSON.stringify($json.text).slice(1, -1) }}\\n判斷依據：{{ JSON.stringify($json.search.map(item => item.content)).slice(2, -2).replace(/\\\"|\\\\r|\\\\n|\\\\t|\\\\/g, '') }}\\n\\n請執行：\\n1. 根據上述「判斷依據」全文，判斷「文章」是否正確反映內容（布林值）。\\n2. 用 50 字以內說明判斷理由與因果關係。\\n\\n輸出格式：回傳單一 JSON 物件，包含兩個欄位：\\n- correct（布林值）\\n- causal（判斷理由與因果關係）\\n\\n注意：僅回傳 JSON，不要任何多餘文字。\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        300
+      ],
+      "id": "f9e5b153-1fd4-46b7-b6e0-0fde7918ee3a",
+      "name": "Summarize",
+      "credentials": {
+        "openAiApi": {
+          "id": "yzJpVaYC1wgkFngZ",
+          "name": "OpenAi account Test234"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 用 LLM 做結論，加入 3 個欄位\n```\n[\n  {\n    \"correct\": true,    // 子段落正確性\n    \"rationale\": \"...\", // 判斷理由\n    \"causal\": \"...\"     // 因果關聯\n  }\n]\n```",
+        "height": 400,
+        "width": 1540
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -60,
+        60
+      ],
+      "typeVersion": 1,
+      "id": "f9e0e473-0c62-41bf-a313-5fcb52fbe713",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        220,
+        225
+      ],
+      "id": "414e061e-6d09-4d34-a73d-8dbf63375be4",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        260
+      ],
+      "id": "6f1e7bd3-3202-470d-a040-ae22d1fea431"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        140
+      ],
+      "id": "d905d3d7-1670-4f0c-bec3-0bf54878363b",
+      "name": "all paragraph"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        225
+      ],
+      "id": "d2f1a304-7fc3-443e-84c7-6a651020bcca",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1100,
+        260
+      ],
+      "id": "5faeea0e-f09a-42a2-bb2e-19b6192f6a2f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. 取出 OpenAI 回傳的原始 content 字串\nconst raw = $input.all()[0].json.choices[0].message.content;\n\n// 2. 去除 ```json 和 ``` fence\nconst cleaned = raw\n  .replace(/```json\\s*/, '')   // 去掉開頭 ```json\n  .replace(/```$/, '')         // 去掉尾端 ```\n  .trim();\n\n// 3. 解析成物件\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (e) {\n  throw new Error(`無法解析回傳內容: ${e.message}\\n解析前字串：\\n${cleaned}`);\n}\n\n// 4. 解構需要的欄位\nconst { correct, rationale, causal } = parsed;\n\n// 5. 回傳成新的 item\nreturn [\n  {\n    json: {\n      correct,\n      rationale,\n      causal\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "id": "d6759629-e69e-49b5-ae26-25585caf439c",
+      "name": "clear markdown",
+      "notes": "這種 json ... 包裝是 GPT 在遇到系統提示「請輸出 JSON」時的常見行為，為了人類易讀而非程式易讀。因此幾乎所有 LLM 自動工作流都要先「清 markdown、再 parse」。"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        300
+      ],
+      "id": "2a2118d5-7987-4844-8c5e-575a7aa3287c",
+      "name": "Wait 20s",
+      "webhookId": "e0d4e856-a10b-4eb5-9c81-7412155c48be"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "clear markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "all paragraph",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 20s",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "clear markdown": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wait 20s": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b52ae254-a272-4077-8f10-867b65d37bad",
+  "meta": {
+    "instanceId": "b0b89cfd4d11fe19f0357f65a939ec78acbccae34cbb9f96a51e6756b48f44f0"
+  },
+  "id": "Ip5B2FswX8e92yVY",
+  "tags": []
+}

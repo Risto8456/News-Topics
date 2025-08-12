@@ -1,0 +1,906 @@
+{
+  "name": "main",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/tfc_output/test_result/{{ $('Merge').item.json.id }}_final.json",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        940
+      ],
+      "id": "8daf35f5-1b7d-4b39-851e-2634dededfd1",
+      "name": "Write files to disk"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": "result"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1860,
+        940
+      ],
+      "id": "ced6f158-f771-492b-858d-ad94706b4697",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "EkkgRFwaAvBW0IoD",
+          "mode": "list",
+          "cachedResultName": "KeyWord"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        920
+      ],
+      "id": "690cdbd6-6418-4f75-9ef9-fccea8a6a05a",
+      "name": "Get All Divide Keywords",
+      "notesInFlow": true,
+      "notes": "段落切割 & 併行關鍵詞提取"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1060,
+        1280
+      ],
+      "id": "26ad519a-cae5-467c-a628-06ca36f5fea9",
+      "name": "Click to start workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yT0V2G6W0rj9Nffn",
+          "mode": "list",
+          "cachedResultName": "google search"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        920
+      ],
+      "id": "741d86ef-ac49-41fe-b9b8-6bb92120dc1c",
+      "name": "All Divide Google Search",
+      "notesInFlow": true,
+      "notes": "各段落用查詢點做 google 查詢"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e14fb3ab-2594-4188-9b6f-769fd1c006a1",
+              "name": "content",
+              "value": "網傳「用手機號碼最末碼可以推算出年齡」？\\n\\n這是經過設計的數學算式，百歲以上不適用。\\n\\n發佈：\\n\\n2025-02-04\\n\\n更新：\\n\\n2025-02-04\\n\\n報告編號：\\n\\n3458\\n\\n查核記者：\\n\\n曾慧雯\\n\\n責任編輯：\\n\\n陳培煌\\n\\n發佈：\\n\\n2025-02-04\\n\\n報告編號：\\n\\n3458\\n\\n記者：\\n\\n曾慧雯、\\n\\n責任編輯：\\n\\n陳培煌\\n\\n近日有傳言稱「手機最末碼與年齡100%相關」，可以用手機號碼推算出年齡；其實，手機號碼與年齡並無關係，這是設計好的數學算式。\\n\\n一、數感實驗室及數學教師均表示，傳言內容是設計好的數學算式，主要是利用四則運算把「2025」藏在算式中，再引導民眾減去自己的西元出生年，自然就能得出自己的年齡。例外則是百歲以上不適用。\\n\\n二、早在2014年即流傳過類似傳言。每一年，傳言裡的數字會跟著西元年的變化而需要調整；例如明年2026年，只要把步驟5的「加1775」改成「加1776」，就可以算出自身年齡。\\n\\n傳言內容是設計好的數學算式，讓結果剛好等於當年年份（比如今年是2025年）減去民眾出生年就可以得出年齡，並非「手機號碼與年齡100%相關」。因此，為「易生誤解」訊息。\\n\\n背景\\n\\n近日社群平台及通訊軟體流傳「2025新版數學遊戲題」，聲稱持有手機的任何人，其年齡與手機號碼100%相關，只要照著6個步驟計算，就能得出一組三位數，百位數是手機最末碼，十位及個位數就是你今年的年齡。\\n\\n查核\\n\\n查核點、傳言說法是真的嗎？\\n\\n（一）查核中心協請數感實驗室共同創辦人、臺灣師範大學電機工程學系副教授賴以威檢視傳言內容。賴以威表示，網路上常見類似數字遊戲，實際上手機號碼與年齡並無關聯，這也不是魔術，而是一套設計好的數學算式，一步步拆解後就會很清楚。\\n\\n賴以威表示，先假設手機末碼為X，傳言「推算今年的年齡」的目標是要寫出「100X+生日」，計算步驟如乘以2、乘以50，都是為了算出「100X」，而250加上1775則是為了要不著痕跡地得出「2025」這個數字。也就是說，這些數字都是設計好的，但也可以用其他數字替換（例如乘以2、加5、乘以50也可以換成乘以4、加10、乘以25），只要倒推回去想，就比較容易理解了。\\n\\n不過，賴以威也補充說明，網傳這套算法只適用99歲以下的人，大於100歲就算不準了。\\n\\n數感實驗室算式拆解及說明如下：\\n\\n（二）高雄市四維國小數學教師黃馨儀表示，這是一個逆推就可以設計數字的題目。她說，傳言的關鍵是250加上1775得出2025（今年），但又不能直接寫出2025，因此才要用手機末碼乘以2再乘以50（亦即乘以100），利用此障眼法，可讓手機末碼數字落在百位數，且不會影響到十位數及個位數。\\n\\n黃馨儀解釋，這個題目會跟著西元年的變化而需要調整，例如明年2026年，只要把步驟5的加1775改成1776即可；至於此題的例外就是不適用於百歲以上者。\\n\\n類似傳言在2014年就流傳過\\n\\n利用傳言文字搜尋，可發現早在2014年就已流傳過\\n\\n，只不過當時傳言的步驟5是「加上1764」（2025年則改為「加上1775」），並引導民眾減去自己的西元出生年，算出來的當然就是自己的年齡了。",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -840,
+        1060
+      ],
+      "id": "06e01d2e-9a2c-4c2d-bcbd-d67a65d4b156",
+      "name": "Test Article content",
+      "notesInFlow": true,
+      "disabled": true,
+      "notes": "測試用文章內容"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 先把 DataA 的所有 json 取出來，放到一個陣列\nconst dataA = $input.all().map(item => item.json);\n\n// DataB 的 items\nconst itemsB = $('Loop Over Items').first().json;\n\n// 把 dataA 整個塞到 B 的 paragraph 欄位\nitemsB.paragraph = dataA;\n\nreturn itemsB;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        920
+      ],
+      "id": "ce2a737e-7a87-40ee-918e-8a63d8d8aa10",
+      "name": "merge"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Ip5B2FswX8e92yVY",
+          "mode": "list",
+          "cachedResultName": "completion"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        920,
+        920
+      ],
+      "id": "b9d81051-987d-4a02-b25b-c1811e9af4fb",
+      "name": "Get completion"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"temperature\": 0.2,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"你是〈最終評價整合專家〉。\\n\\n請根據使用者提供的新聞各段落之「子段落正確性」以及「判斷依據」，整合並給予該篇新聞的評語以及可信度分數。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"新聞各段落之「編號」、「子段落正確性」以及「判斷依據」：{{ $json.data.toJsonString().replace(/\\\"|\\\\r|\\\\n|\\\\t|\\\\/g, '') }}\\n\\n請執行：\\n1. 根據上述各段落之判斷，統整並給予整篇新聞評語，20 字以內，如：部分真實、需要近一步驗證...等等。\\n2. 給予整篇新聞之可信度百分比。\\n\\n輸出格式：回傳單一 JSON 物件，包含兩個欄位：\\n- omments(評語) \\n- credibility（可信度）\\n\\n注意：僅回傳 JSON，不要任何多餘文字。\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1180,
+        1200
+      ],
+      "id": "354754f2-182e-4719-849e-7b18dc6fbd41",
+      "name": "final unification",
+      "credentials": {
+        "openAiApi": {
+          "id": "9qslhvd1PKSasCa1",
+          "name": "OpenAi account Tom"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 取得 paragraph 陣列\nconst para = $json.paragraph;\n\n// 只保留 id、correct、causal\nreturn para.map(p => {\n  return {\n    id: p.id,\n    correct: p.correct,\n    causal: p.causal\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        1200
+      ],
+      "id": "0e8a1b18-e019-4fd3-a63b-314b1d7a4f15",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        920,
+        1200
+      ],
+      "id": "eb6e4864-1656-4cd0-a487-1c7f8abd7fd2",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. 取出 OpenAI 回傳的原始 content 字串\nconst raw = $input.first().json.choices[0].message.content;\n\n// 2. 去除 ```json 和 ``` fence\nconst cleaned = raw\n  .replace(/```json\\s*/, '')   // 去掉開頭 ```json\n  .replace(/```$/, '')         // 去掉尾端 ```\n  .trim();\n\n// 3. 解析成物件\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (e) {\n  throw new Error(`無法解析回傳內容: ${e.message}\\n解析前字串：\\n${cleaned}`);\n}\n\n// 4. 解構需要的欄位\nconst { comments, credibility } = parsed;\n\n// 5. 回傳成新的 item\nreturn [\n  {\n    json: {\n      comments,\n      credibility\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        1200
+      ],
+      "id": "7739d044-edb1-40ad-a75b-4366f0f450e8",
+      "name": "clear markdown",
+      "notes": "這種 json ... 包裝是 GPT 在遇到系統提示「請輸出 JSON」時的常見行為，為了人類易讀而非程式易讀。因此幾乎所有 LLM 自動工作流都要先「清 markdown、再 parse」。"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1640,
+        940
+      ],
+      "id": "7fcefbf3-0196-4d3e-9b35-55b97567811f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/files/tfc_output/test_data_cleared.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        1280
+      ],
+      "id": "94153f13-101a-4c69-9db7-1e7ee9d94329",
+      "name": "Read Json Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        1280
+      ],
+      "id": "c3ec1bdc-1718-4b88-9408-12df636bddad",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/tfc_output/test_result/{{ $('Loop Over Items').item.json.id }}_keywords_result.json",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        500,
+        680
+      ],
+      "id": "5b8be3d0-ca75-4945-864a-a3b0a67e8fb2",
+      "name": "Write files to disk1"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": "result"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        380,
+        680
+      ],
+      "id": "85333d8c-0862-466d-a377-7e1929dd8f16",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/tfc_output/test_result/{{ $('Loop Over Items').item.json.id }}_search_result.json",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        960,
+        680
+      ],
+      "id": "f325e1b4-003f-4752-92a4-16fd7cdad62a",
+      "name": "Write files to disk2"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": "result"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        840,
+        680
+      ],
+      "id": "799ace31-5022-4bfa-99a3-ccf933460bd4",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/tfc_output/test_result/{{ $('Loop Over Items').item.json.id }}_completion.json",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        680
+      ],
+      "id": "327eb54d-1dcd-4f3f-bc4e-056309dfaf9b",
+      "name": "Write files to disk3"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": "result"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        680
+      ],
+      "id": "11c5b5bd-0bf6-4303-9ab0-ce1f13cddf41",
+      "name": "Convert to File3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -380,
+        1280
+      ],
+      "id": "bc91b394-c9d8-4304-a75e-7b5253a8709d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        2540,
+        1320
+      ],
+      "id": "96e92dc2-b7e8-4d76-b5d9-9b7a041e087b"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        260,
+        680
+      ],
+      "id": "c6783704-d202-4b36-a1f4-40f332743a66",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        720,
+        680
+      ],
+      "id": "3441360e-30ca-459b-b576-f5c100378748",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        680
+      ],
+      "id": "e42f00e9-3614-43b8-819a-780dd6346c37",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2300,
+        940
+      ],
+      "id": "e44a5704-2ee6-4196-9bfa-24f7b217c06a",
+      "name": "Wait",
+      "webhookId": "811bdb3d-812e-4eda-9eb0-a4f147831155"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Get All Divide Keywords').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        920
+      ],
+      "id": "fc1791ec-9b0a-40b6-9ac1-9795b8cb67de",
+      "name": "Code1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('All Divide Google Search').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        920
+      ],
+      "id": "fd641f2a-3644-4124-b90c-271921d4481b",
+      "name": "Code2",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Get completion').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        920
+      ],
+      "id": "c94df49d-1683-4805-83ff-ab734fc1b350",
+      "name": "Code3",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "995726ff-b88e-415e-a15e-11e7c1550d24",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -140,
+        1300
+      ],
+      "id": "c5ef4396-7de1-433b-b35a-be38f846c723",
+      "name": "Start from where"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Write files to disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Divide Keywords": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Click to start workflow": {
+      "main": [
+        [
+          {
+            "node": "Test Article content",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Json Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All Divide Google Search": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Article content": {
+      "main": [
+        []
+      ]
+    },
+    "merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get completion": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "final unification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final unification": {
+      "main": [
+        [
+          {
+            "node": "clear markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "clear markdown": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Json Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Write files to disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "Write files to disk2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File3": {
+      "main": [
+        [
+          {
+            "node": "Write files to disk3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Start from where",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write files to disk": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Convert to File3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write files to disk1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write files to disk2": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write files to disk3": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "All Divide Google Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Get completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start from where": {
+      "main": [
+        [
+          {
+            "node": "Get All Divide Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "61fd038f-2838-465a-b5ec-7fe979eafb19",
+  "meta": {
+    "instanceId": "b0b89cfd4d11fe19f0357f65a939ec78acbccae34cbb9f96a51e6756b48f44f0"
+  },
+  "id": "l3I3HBsUHFP1v41L",
+  "tags": []
+}

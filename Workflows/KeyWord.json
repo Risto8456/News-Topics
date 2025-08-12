@@ -1,0 +1,304 @@
+{
+  "name": "KeyWord",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        90
+      ],
+      "id": "4f9fdfa5-bb0b-447c-bf3c-c75d37f0c940",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "re1CALwM98Ey7AUJ",
+          "mode": "list",
+          "cachedResultName": "Get One Divide Keywords"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        180
+      ],
+      "id": "a0b3034c-5430-4d56-85df-e2174c633aff",
+      "name": "Get 3 Divide Keywords"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        180
+      ],
+      "id": "b6296d59-d22b-4064-b53f-e1d51a608a10",
+      "name": "Wait 20s",
+      "webhookId": "4d7eb8f7-3e67-4eb1-bbba-c4e509fde28d"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. 取得 HTTP Request 的輸出\nconst items = $input.all();\nif (items.length === 0) return [];\n\nconst response = items[0].json;\nlet raw = response.candidates[0].content.parts[0].text;\n\n// 2. 移除 ```json ``` 標記\nraw = raw.replace(/^```json\\s*|\\s*```$/g, \"\").trim();\n\n// 3. 找到最外層中括號範圍\nconst start = raw.indexOf('[');\nconst end = raw.lastIndexOf(']');\nif (start === -1 || end === -1 || end <= start) {\n  throw new Error('無法在回傳中找到完整的 JSON 陣列');\n}\n\n// 4. 擷取陣列字串並解析\nconst jsonText = raw.slice(start, end + 1);\nlet parsed;\ntry {\n  parsed = JSON.parse(jsonText);\n} catch (e) {\n  throw new Error(`截取後 JSON 解析錯誤：${e.message}`);\n}\n\n// 5. 回傳每段新聞為一筆 item\nreturn parsed.map(p => ({ json: p }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        120,
+        90
+      ],
+      "id": "8d356f93-b3e0-4ca5-882f-d37b23de1012",
+      "name": "clear markdown",
+      "notes": "這種 json ... 包裝是 GPT 在遇到系統提示「請輸出 JSON」時的常見行為，為了人類易讀而非程式易讀。因此幾乎所有 LLM 自動工作流都要先「清 markdown、再 parse」。"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        980,
+        120
+      ],
+      "id": "a5ab8dae-4292-4efa-bff3-9c783a3f5613",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me2",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        120
+      ],
+      "id": "dd554b7c-f01b-4a6f-950d-220fb2db806a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"你是〈段落分析員〉。\\n請把以下新聞依「話題轉折」或「段落換行」切成最適合的 5–7 個段落，並為每段起一個 7~12 字的「段落標題」（純敘述，勿含評論）。\\n輸出 JSON 陣列，欄位為\\n  - id（從 1 起算）\\n  - title（段落標題）\\n  - text（該段原文）\\n\\n文章內容：\\n{{ JSON.stringify($json.text_clean).slice(1, -1) }}\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        90
+      ],
+      "id": "260d6b6a-5cc0-4840-a9ee-7a0ad86a359c",
+      "name": "LLM Divide",
+      "credentials": {
+        "openAiApi": {
+          "id": "9qslhvd1PKSasCa1",
+          "name": "OpenAi account Tom"
+        },
+        "googlePalmApi": {
+          "id": "M7i2SCZNKjbXmox5",
+          "name": "Tom Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        340,
+        90
+      ],
+      "id": "21728e09-353e-4409-8e7d-4b272fee320c",
+      "name": "Loop Over 3 Items"
+    },
+    {
+      "parameters": {
+        "content": "## 將文章拆解成數個子段落，並做併行之關鍵詞(查詢點)提取",
+        "height": 320,
+        "width": 1780,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -380,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "c88eb3af-4cc1-4654-88be-c2284bbe5149",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.100.4:5000/chunking",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.content }}\", \n  \"threshold\": 0.55\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        320
+      ],
+      "id": "f10bb6a5-a755-4380-a64a-850c95b735b5",
+      "name": "chunking_api",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get 3 Divide Keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wait 20s": {
+      "main": [
+        [
+          {
+            "node": "Get 3 Divide Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "clear markdown": {
+      "main": [
+        [
+          {
+            "node": "Loop Over 3 Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Replace Me2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over 3 Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Divide": {
+      "main": [
+        [
+          {
+            "node": "clear markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "LLM Divide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over 3 Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait 20s",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chunking_api": {
+      "main": [
+        [
+          {
+            "node": "clear markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ecd15341-bb43-48ec-9e05-2ef06855f771",
+  "meta": {
+    "instanceId": "b0b89cfd4d11fe19f0357f65a939ec78acbccae34cbb9f96a51e6756b48f44f0"
+  },
+  "id": "EkkgRFwaAvBW0IoD",
+  "tags": []
+}

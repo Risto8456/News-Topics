@@ -1,0 +1,478 @@
+{
+  "name": "google search",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 1. 根據查詢點做 google search 查詢\n## 2. 用 local API 抓取網頁內文(做初步壓縮)\n### local API 若網頁是 .pdf 或讀取超過 30 秒直接回報 error\n## 3. 建構資料格式，如下：\n```\n[\n  {\n    \"id\": 1,            // 子段落編號\n    \"title\": \"...\",     // 子段落標題\n    \"text\": \"...\",      // 子段落全文\n    \"keywords\": \"...\",  // 子段落查詢點(多個，以逗號隔開)\n    \"search\": [         // google search 搜尋結果陣列\n      {\n        \"id\": 1,            // 搜尋編號\n        \"content\": \"...\",   // 網頁內容提取\n        \"title\": \"...\",     // 網頁內容標題\n        \"url\": \"...\"        // 網址\n      },\n      …\n    ]\n  },\n  ...\n]\n```",
+        "height": 520,
+        "width": 1920,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -200,
+        -360
+      ],
+      "typeVersion": 1,
+      "id": "e99b4091-b6fa-4320-8b2c-ff1d36c63861",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"specific_website\": [\n    [\"tw.news.yahoo.com\", \"Yahoo!新聞\"],\n    [\"www.ettoday.net/news\", \"ETtoday 新聞雲\"],\n    [\"money.udn.com\", \"經濟日報\"],\n    [\"news.ltn.com.tw\", \"自由時報\"],\n    [\"www.chinatimes.com\", \"中時新聞網\"],\n    [\"www.cna.com.tw\", \"中央社\"],\n    [\"www.setn.com\", \"三立新聞網\"],\n    [\"news.tvbs.com.tw\", \"TVBS新聞網\"],\n    [\"www.nownews.com\", \"NOWnews 今日新聞\"],\n    [\"udn.com\", \"聯合新聞網\"],\n    [\"www.storm.mg\", \"風傳媒\"],\n    [\"www.bcc.com.tw\", \"中廣新聞網\"],\n    [\"www.mirrormedia.mg\", \"鏡週刊 / 鏡新聞\"],\n    [\"www.ftvnews.com.tw\", \"民視新聞網\"],\n    [\"news.pts.org.tw\", \"公視新聞網\"],\n    [\"www.taisounds.com\", \"太報\"],\n    [\"www.businesstoday.com.tw\", \"今周刊\"],\n    [\"www.wealth.com.tw\", \"財訊\"],\n    [\"www.cmmedia.com.tw\", \"信傳媒\"],\n    [\"www.peoplenews.tw\", \"民報\"],\n    [\"www.hinet.net/news\", \"HiNet 生活誌\"]\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        820,
+        -340
+      ],
+      "id": "8d35ecef-19b4-43d0-a55a-b3d5182b10a0",
+      "name": "Specific_website",
+      "notesInFlow": true,
+      "executeOnce": true,
+      "notes": "Google Search 指定網頁"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me1",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        0
+      ],
+      "id": "e9ad87ab-03e0-4443-8a02-46667a77b93e"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 先把 DataA 的所有 json 取出來，放到一個陣列\nconst dataA = $input.all().map(item => item.json);\n\n// DataB 的 items\nconst itemsB = $('inferences to the paragraph').first().json;\n\n// 把 dataA 整個塞到 B 的 search 欄位\nitemsB.search = dataA;\n\nreturn itemsB;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "dc030e0c-3749-4e38-b87d-e71a7be4654c",
+      "name": "merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfor (let i = 0; i < items.length; i++) {\n  const old = items[i].json;\n  // 先把 id 放在最前面，後面再展開原本的欄位\n  items[i].json = { id: i + 1, ...old };\n}\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "ffd88042-162e-47dd-bd1c-f3aaf2cdd741",
+      "name": "Add id"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.items.slice(0, 5).map(r => ({\n  title: r.title,\n  link: r.link,\n  snippet: r.snippet,\n})).map(item => ({ json: item }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        -240
+      ],
+      "id": "d1f51da0-718d-4ffe-9fb6-f07314df0609",
+      "name": "Organize data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 篩選掉有 error 欄位的 items\nreturn items.filter(item => !item.json.error);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "e62fe4dd-be54-4662-8969-6010c0334b55",
+      "name": "Remove Error Items"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "options": {},
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "q",
+              "value": "={{ $json.keywords.replaceAll(', ',' AND ') }} site:{{ $json.specific_website.map(item => item[0]).join(' OR ') }} -filetype:pdf -filetype:ppt -filetype:pptx -filetype:xls -filetype:doc"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyBNPw3DsBP4Cw00eeifLW5gKtmBfwBy08Y"
+            },
+            {
+              "name": "cx",
+              "value": "3297253fb8ddd402f"
+            },
+            {
+              "name": "num",
+              "value": "5"
+            },
+            {
+              "name": "lr",
+              "value": "lang_zh-TW"
+            },
+            {
+              "name": "cr",
+              "value": "countryTW"
+            }
+          ]
+        }
+      },
+      "id": "c307e80c-4b88-42a2-811f-2d67fc19e3bc",
+      "name": "Google Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        -240
+      ],
+      "notesInFlow": true,
+      "executeOnce": false,
+      "notes": "根據查詢點做 google search 查詢"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.100.4:5000/extract",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{$json[\"link\"]}}\", \n  \"ref_paragraph\": \"{{ JSON.stringify($('Merge').item.json.text).slice(1, -1) }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "770e490d-3724-496f-b710-26f53cf122bc",
+      "name": "Call Extract API",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1020,
+        -240
+      ],
+      "id": "25e600bd-c4f6-4f7c-80f9-ab794267bf02",
+      "name": "Merge",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        580,
+        -240
+      ],
+      "id": "d7909dcc-7e8b-4074-82dc-316b5ef64163",
+      "name": "inferences to the paragraph"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        240
+      ],
+      "id": "1e1c1b0c-75d6-4429-97bd-eb29fa04db64",
+      "name": "search result"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        -240
+      ],
+      "id": "a030068f-01d3-485e-a3d2-3e84f48ba106",
+      "name": "Click to start workflow"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        380,
+        -240
+      ],
+      "id": "4f55d2cf-c28a-4d1d-8637-638cb5ea09b7",
+      "name": "Keywords result",
+      "disabled": true
+    }
+  ],
+  "pinData": {
+    "Keywords result": [
+      {
+        "json": {
+          "id": 1,
+          "title": "網路流傳手機末碼推算年齡說法引發關注",
+          "text": "網傳「用手機號碼最末碼可以推算出年齡」？\n\n這是經過設計的數學算式，百歲以上不適用。\n\n發佈：\n\n2025-02-04\n\n更新：\n\n2025-02-04\n\n報告編號：\n\n3458\n\n查核記者：\n\n曾慧雯\n\n責任編輯：\n\n陳培煌\n\n發佈：\n\n2025-02-04\n\n報告編號：\n\n3458\n\n記者：\n\n曾慧雯、\n\n責任編輯：\n\n陳培煌",
+          "keywords": "手機號碼, 年齡, 數學算式, 2025-02-04, 曾慧雯, 陳培煌"
+        }
+      },
+      {
+        "json": {
+          "id": 2,
+          "title": "傳言為設計算式，手機號碼與年齡無關聯",
+          "text": "近日有傳言稱「手機最末碼與年齡100%相關」，可以用手機號碼推算出年齡；其實，手機號碼與年齡並無關係，這是設計好的數學算式。",
+          "keywords": "手機號碼, 年齡, 傳言, 數學算式"
+        }
+      },
+      {
+        "json": {
+          "id": 3,
+          "title": "專家：算式藏年份，百歲以上不適用此法",
+          "text": "一、數感實驗室及數學教師均表示，傳言內容是設計好的數學算式，主要是利用四則運算把「2025」藏在算式中，再引導民眾減去自己的西元出生年，自然就能得出自己的年齡。例外則是百歲以上不適用。",
+          "keywords": "數感實驗室, 數學教師, 四則運算, 2025, 西元出生年, 年齡"
+        }
+      },
+      {
+        "json": {
+          "id": 4,
+          "title": "類似傳言多年前已出現，數字隨年份調整",
+          "text": "二、早在2014年即流傳過類似傳言。每一年，傳言裡的數字會跟著西元年的變化而需要調整；例如明年2026年，只要把步驟5的「加1775」改成「加1776」，就可以算出自身年齡。",
+          "keywords": "2014年, 2026年, 傳言, 數字, 步驟5, 加1775"
+        }
+      },
+      {
+        "json": {
+          "id": 5,
+          "title": "此訊息易生誤解，實為數學算式設計",
+          "text": "傳言內容是設計好的數學算式，讓結果剛好等於當年年份（比如今年是2025年）減去民眾出生年就可以得出年齡，並非「手機號碼與年齡100%相關」。因此，為「易生誤解」訊息。",
+          "keywords": "數學算式, 當年年份, 民眾出生年, 年齡, 手機號碼, 易生誤解訊息"
+        }
+      },
+      {
+        "json": {
+          "id": 6,
+          "title": "社群流傳新版數學遊戲，聲稱可推算年齡",
+          "text": "背景\n\n近日社群平台及通訊軟體流傳「2025新版數學遊戲題」，聲稱持有手機的任何人，其年齡與手機號碼100%相關，只要照著6個步驟計算，就能得出一組三位數，百位數是手機最末碼，十位及個位數就是你今年的年齡。",
+          "keywords": "社群平台, 通訊軟體, 2025新版數學遊戲題, 手機號碼, 三位數, 年齡"
+        }
+      },
+      {
+        "json": {
+          "id": 7,
+          "title": "專家拆解算式，強調與年齡無關，僅適用99歲以下",
+          "text": "查核\n\n查核點、傳言說法是真的嗎？\n\n（一）查核中心協請數感實驗室共同創辦人、臺灣師範大學電機工程學系副教授賴以威檢視傳言內容。賴以威表示，網路上常見類似數字遊戲，實際上手機號碼與年齡並無關聯，這也不是魔術，而是一套設計好的數學算式，一步步拆解後就會很清楚。\n\n賴以威表示，先假設手機末碼為X，傳言「推算今年的年齡」的目標是要寫出「100X+生日」，計算步驟如乘以2、乘以50，都是為了算出「100X」，而250加上1775則是為了要不著痕跡地得出「2025」這個數字。也就是說，這些數字都是設計好的，但也可以用其他數字替換（例如乘以2、加5、乘以50也可以換成乘以4、加10、乘以25），只要倒推回去想，就比較容易理解了。\n\n不過，賴以威也補充說明，網傳這套算法只適用99歲以下的人，大於100歲就算不準了。",
+          "keywords": "查核中心, 數感實驗室, 賴以威, 手機號碼, 年齡, 數學算式"
+        }
+      },
+      {
+        "json": {
+          "id": 8,
+          "title": "教師：算式可逆推設計，隨年份調整數字",
+          "text": "數感實驗室算式拆解及說明如下：\n\n（二）高雄市四維國小數學教師黃馨儀表示，這是一個逆推就可以設計數字的題目。她說，傳言的關鍵是250加上1775得出2025（今年），但又不能直接寫出2025，因此才要用手機末碼乘以2再乘以50（亦即乘以100），利用此障眼法，可讓手機末碼數字落在百位數，且不會影響到十位數及個位數。\n\n黃馨儀解釋，這個題目會跟著西元年的變化而需要調整，例如明年2026年，只要把步驟5的加1775改成1776即可；至於此題的例外就是不適用於百歲以上者。",
+          "keywords": "高雄市四維國小, 數學教師黃馨儀, 250加上1775, 2025, 手機末碼, 明年2026年"
+        }
+      },
+      {
+        "json": {
+          "id": 9,
+          "title": "傳言多年前已流傳，算式數字略有不同",
+          "text": "類似傳言在2014年就流傳過\n\n利用傳言文字搜尋，可發現早在2014年就已流傳過\n\n，只不過當時傳言的步驟5是「加上1764」（2025年則改為「加上1775」），並引導民眾減去自己的西元出生年，算出來的當然就是自己的年齡了。",
+          "keywords": "傳言, 2014年, 步驟5, 1764, 2025年, 1775"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Specific_website": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me1": {
+      "main": [
+        [
+          {
+            "node": "inferences to the paragraph",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge": {
+      "main": [
+        [
+          {
+            "node": "Replace Me1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add id": {
+      "main": [
+        [
+          {
+            "node": "merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Organize data": {
+      "main": [
+        [
+          {
+            "node": "Call Extract API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Error Items": {
+      "main": [
+        [
+          {
+            "node": "Add id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Search": {
+      "main": [
+        [
+          {
+            "node": "Organize data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Extract API": {
+      "main": [
+        [
+          {
+            "node": "Remove Error Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inferences to the paragraph": {
+      "main": [
+        [
+          {
+            "node": "search result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Specific_website",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Click to start workflow": {
+      "main": [
+        [
+          {
+            "node": "Keywords result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keywords result": {
+      "main": [
+        [
+          {
+            "node": "inferences to the paragraph",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4aad091b-971e-419e-846f-1b8f6f5fb449",
+  "meta": {
+    "instanceId": "b0b89cfd4d11fe19f0357f65a939ec78acbccae34cbb9f96a51e6756b48f44f0"
+  },
+  "id": "yT0V2G6W0rj9Nffn",
+  "tags": []
+}
