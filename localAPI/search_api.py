@@ -1,11 +1,11 @@
 # search_api.py
 def extract_article_main(urls, ref_paragraph=None):
-    from read import get_article
+    from read1_2_1 import get_article
     results = []
 
     for url in urls:
         try:
-            article = get_article(url, ref_paragraph, 3, 0.55)
+            article = get_article(url, ref_paragraph)
             if article.content:
                 results.append({
                     "url": url,
