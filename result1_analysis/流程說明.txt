@@ -1,0 +1,6 @@
+流程說明
+使用者輸入分段：LLM Gemini
+每段提取關鍵詞：LLM Open AI
+Google Search 文章精簡：單純依據子分段 + 相似度挑選
+每段依搜尋結果判斷真偽：LLM Open AI
+結果整合：LLM Open AI
