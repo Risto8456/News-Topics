@@ -10,3 +10,11 @@
 + n8n HTTP Request 節點使用時
   1. 將文章依語意分段：http://192.168.100.2:5000/chunking
   2. 網頁爬蟲抓取文字：http://192.168.100.2:5000/extract
+## 餘弦相似度計算 `bge-base-zh-v1.5` model
++ 執行以下 python 程式碼下載
+```py=
+from huggingface_hub import snapshot_download
+snapshot_download("BAAI/bge-base-zh-v1.5",
+                  local_dir="/models/bge-base-zh-v1.5",
+                  local_dir_use_symlinks=False)
+```
