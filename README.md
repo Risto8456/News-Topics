@@ -18,3 +18,5 @@ snapshot_download("BAAI/bge-base-zh-v1.5",
                   local_dir="/models/bge-base-zh-v1.5",
                   local_dir_use_symlinks=False)
 ```
+
+## 結果分析 result1_analysis
